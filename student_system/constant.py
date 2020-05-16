@@ -2,7 +2,7 @@ class Success(object):
     SUCCESS_RESPONSE = "Successful"
     SUCCESS = "Success"
 
-    STUDENT_PROFILE_CREATE_SUCCESS = "Successfully created user profile."
+    STUDENT_PROFILE_CREATE_SUCCESS = "Successfully created student profile."
     CLASSES_FETCHED_SUCCESS = "Successfully fetched sessions and questions."
 
 
