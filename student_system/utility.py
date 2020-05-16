@@ -1,16 +1,16 @@
 import logging
 
-from django.db.models import Prefetch
+from student_system.response import SuccessResponse, ErrorResponse
+from student_system.constant import Success, Error
+from student_system.models import Student, AvailableSessions, Classes
+from student_system.serializers import StudentSerializer, AvailableSessionsSerializer
 
-from student_system.response import SuccessResponse,ErrorResponse, ServerErrorResponse
-from student_system.constant import Success,Error
-from student_system.models import Student, AvailableSessions, Question, Classes
-from student_system.serializers import StudentSerializer, ClassSerializer, QuestionSerializer
 from rest_framework.authtoken.models import Token
 
-
+from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
 
 logger = logging.getLogger(__name__)
 
@@ -59,36 +59,32 @@ def fetch_user_id_from_token(token):
 def get_assigned_sessions(user_id):
     try:
         user_obj = Student.objects.get(user_id=user_id)
-
         sessions_qset = AvailableSessions.objects.filter(grade=user_obj.grade,
                                                          board=user_obj.board).prefetch_related(
                                                          Prefetch('classes', to_attr='sessions_lst',
-                                                         queryset=Classes.objects.prefetch_related(
-                                                         Prefetch('question',to_attr="related_questions"))))
-
-        result = {"grade": user_obj.grade, "board": user_obj.board}
+                                                                  queryset=Classes.objects.prefetch_related(
+                                                                   Prefetch('questions',to_attr="related_questions"))))
 
         if sessions_qset:
             for sess in sessions_qset:
-                sessions_list = []
                 classes = sess.sessions_lst
+
                 for cls in classes:
-                    questions = cls.related_questions
-                    qn_list = []
-                    if questions:
-                        for question in questions:
-                            serialized_question = QuestionSerializer(question)
-                            qn_list.append(serialized_question.data)
+                    class_related_questions = cls.related_questions
 
-                    session = {"class": cls.session, "date": cls.date, "questions": qn_list}
-                    sessions_list.append(session)
-            result["sessions"] = sessions_list
+                    if class_related_questions:
+                        for ques in class_related_questions:
+                            cls.questions.add(ques)
 
-            return SuccessResponse(msg=Success.CLASSES_FETCHED_SUCCESS, results=result)
+                    sess.classes.add(cls)
+
+                serialized_session_obj = AvailableSessionsSerializer(sess)
+
+            return SuccessResponse(msg=Success.CLASSES_FETCHED_SUCCESS, results=serialized_session_obj.data)
 
         else:
             return SuccessResponse(msg=Error.NO_CLASSES_AVAILABLE)
 
     except Exception as e:
-        logger.error(Error.SESSION_FETCHING_ERROR + str(e))
+        logger.error(Error.CLASSES_FETCHING_ERROR + str(e))
         return None

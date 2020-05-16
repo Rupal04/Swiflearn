@@ -26,7 +26,7 @@ class Classes(models.Model):
     class Meta:
         db_table = 'classes'
     session = models.CharField(max_length=1000, null=False, blank=False)
-    question = models.ManyToManyField(Question, blank=True, null=True)
+    questions = models.ManyToManyField(Question, blank=True, null=True)
     date = models.DateField(default=datetime.now()+timedelta(days=30))
 
 

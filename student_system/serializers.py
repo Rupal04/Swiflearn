@@ -1,6 +1,5 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from student_system.models import Student, Classes, Question
+from student_system.models import Student, Classes, Question, AvailableSessions
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -26,9 +25,18 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class ClassSerializer(serializers.ModelSerializer):
-    question = QuestionSerializer()
+    questions = QuestionSerializer(many=True)
 
     class Meta:
         model = Classes
-        fields = ['question', 'date', 'session']
+        fields = ['questions', 'date', 'session']
+
+
+class AvailableSessionsSerializer(serializers.ModelSerializer):
+    classes = ClassSerializer(many=True)
+
+    class Meta:
+        model = AvailableSessions
+        fields = ['grade', 'board', 'classes']
+
 

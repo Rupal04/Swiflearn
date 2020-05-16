@@ -3,7 +3,7 @@ class Success(object):
     SUCCESS = "Success"
 
     STUDENT_PROFILE_CREATE_SUCCESS = "Successfully created user profile."
-    CLASSES_FETCHED_SUCCESS= "Successfully fetched sessions and questions."
+    CLASSES_FETCHED_SUCCESS = "Successfully fetched sessions and questions."
 
 
 class Error(object):
@@ -14,7 +14,7 @@ class Error(object):
     STUDENT_PROFILE_CREATION_ERROR = "Error in creating student profile."
     USER_CREATION_ERROR = "Error in creating user."
 
-    USER_ID_FETCH_ERROR="Error in fetching user id."
+    USER_ID_FETCH_ERROR = "Error in fetching user id."
     CLASSES_FETCHING_ERROR = "Error in fetching available sessions for that user."
 
     NO_CLASSES_AVAILABLE = "There are no sessions available for this board and grade."
