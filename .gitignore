@@ -1,0 +1,4 @@
+student_system/migrations/*
+venv/*
+.idea/*
+*.pyc
