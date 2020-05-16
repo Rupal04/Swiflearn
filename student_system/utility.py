@@ -59,29 +59,24 @@ def fetch_user_id_from_token(token):
 def get_assigned_sessions(user_id):
     try:
         user_obj = Student.objects.get(user_id=user_id)
-        sessions_qset = AvailableSessions.objects.filter(grade=user_obj.grade,
+        available_session_obj = AvailableSessions.objects.filter(grade=user_obj.grade,
                                                          board=user_obj.board).prefetch_related(
                                                          Prefetch('classes', to_attr='sessions_lst',
                                                                   queryset=Classes.objects.prefetch_related(
-                                                                   Prefetch('questions',to_attr="related_questions"))))
+                                                                   Prefetch('questions', to_attr="related_questions")))
+                                                            ).first()
+        if available_session_obj:
+            classes = available_session_obj.sessions_lst
+            for cls in classes:
+                class_related_questions = cls.related_questions
 
-        if sessions_qset:
-            for sess in sessions_qset:
-                classes = sess.sessions_lst
+                if class_related_questions:
+                    for ques in class_related_questions:
+                        cls.questions.add(ques)
 
-                for cls in classes:
-                    class_related_questions = cls.related_questions
-
-                    if class_related_questions:
-                        for ques in class_related_questions:
-                            cls.questions.add(ques)
-
-                    sess.classes.add(cls)
-
-                serialized_session_obj = AvailableSessionsSerializer(sess)
-
+                available_session_obj.classes.add(cls)
+            serialized_session_obj = AvailableSessionsSerializer(available_session_obj)
             return SuccessResponse(msg=Success.CLASSES_FETCHED_SUCCESS, results=serialized_session_obj.data)
-
         else:
             return SuccessResponse(msg=Error.NO_CLASSES_AVAILABLE)
 
