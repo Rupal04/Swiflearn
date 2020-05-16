@@ -17,5 +17,5 @@ class Error(object):
     USER_ID_FETCH_ERROR = "Error in fetching user id."
     CLASSES_FETCHING_ERROR = "Error in fetching available sessions for that user."
 
-    NO_CLASSES_AVAILABLE = "There are no sessions available for this board and grade."
+    NO_SESSIONS_AVAILABLE = "There are no sessions available for this board and grade."
 

@@ -60,10 +60,11 @@ def get_assigned_sessions(user_id):
     try:
         user_obj = Student.objects.get(user_id=user_id)
         available_session_obj = AvailableSessions.objects.filter(grade=user_obj.grade,
-                                                         board=user_obj.board).prefetch_related(
-                                                         Prefetch('classes', to_attr='sessions_lst',
-                                                                  queryset=Classes.objects.prefetch_related(
-                                                                   Prefetch('questions', to_attr="related_questions")))
+                                                                 board=user_obj.board).prefetch_related(
+                                                                 Prefetch('classes', to_attr='sessions_lst',
+                                                                          queryset=Classes.objects.prefetch_related(
+                                                                            Prefetch('questions',
+                                                                                     to_attr="related_questions")))
                                                             ).first()
         if available_session_obj:
             classes = available_session_obj.sessions_lst
@@ -78,7 +79,7 @@ def get_assigned_sessions(user_id):
             serialized_session_obj = AvailableSessionsSerializer(available_session_obj)
             return SuccessResponse(msg=Success.CLASSES_FETCHED_SUCCESS, results=serialized_session_obj.data)
         else:
-            return SuccessResponse(msg=Error.NO_CLASSES_AVAILABLE)
+            return SuccessResponse(msg=Error.NO_SESSIONS_AVAILABLE)
 
     except Exception as e:
         logger.error(Error.CLASSES_FETCHING_ERROR + str(e))
